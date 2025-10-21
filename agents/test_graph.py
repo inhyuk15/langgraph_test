@@ -6,6 +6,7 @@ from langgraph.checkpoint.memory import InMemorySaver
 
 from agents.code_generator import build_code_generator
 from agents.states import TestState
+from agents.code_reader import build_code_reader
 
 def from_code_out(state):
     sr = state.get("structured_response")
@@ -19,6 +20,11 @@ def show_file_path(state: TestState):
     
     print(f"this is file path: {file_path}")
 
+def show_code_content(state: TestState):
+    sr = state.get('structured_response')
+    code = getattr(sr, 'code')
+    
+    print(f'this is code: \n\n {code}')
     
 class Test:
     def __init__(self, llm):
@@ -27,16 +33,20 @@ class Test:
     def build(self):
         graph = StateGraph(TestState)
         code_generator = build_code_generator(self.llm)
+        code_reader = build_code_reader(self.llm)
+        
         graph.add_node('code_generator', code_generator)
         graph.add_node('from_code_out', from_code_out)
         graph.add_node('show_file_path', show_file_path)
+        graph.add_node('show_code_content', show_code_content)
+        graph.add_node('code_reader', code_reader)
         
         graph.add_edge(START, 'code_generator')
         graph.add_edge('code_generator', 'from_code_out')
         graph.add_edge('from_code_out', 'show_file_path')
-        graph.add_edge('show_file_path', END)
-        # graph.add_edge('code_generator', 'show_file_path')
-        # graph.add_edge('show_file_path', END)
+        graph.add_edge('show_file_path', 'code_reader')
+        graph.add_edge('code_reader', 'show_code_content')
+        graph.add_edge('show_code_content', END)
         
         memory = InMemorySaver()
         return graph.compile(checkpointer=memory)

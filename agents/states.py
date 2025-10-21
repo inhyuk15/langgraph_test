@@ -4,10 +4,7 @@ from pydantic import BaseModel, Field
 from langchain_core.messages import BaseMessage
 from langgraph.graph.message import add_messages
 
-class File(BaseModel):
-    file_path: str = Field(..., description="file's absolute path")
-    extension: str = Field(..., description="extension of file")
-
+from tools.io_tools import File
 
 class TestState(TypedDict, total=False):
     messages: Annotated[list[BaseMessage], add_messages]
