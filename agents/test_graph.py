@@ -23,8 +23,10 @@ def show_file_path(state: TestState):
 def show_code_content(state: TestState):
     sr = state.get('structured_response')
     code = getattr(sr, 'code')
+    tool_history = getattr(sr, 'tool_history')
     
     print(f'this is code: \n\n {code}')
+    print(f'this is tool history: \n\n {tool_history}')
     
 class Test:
     def __init__(self, llm):
@@ -41,10 +43,9 @@ class Test:
         graph.add_node('show_code_content', show_code_content)
         graph.add_node('code_reader', code_reader)
         
+        
         graph.add_edge(START, 'code_generator')
-        graph.add_edge('code_generator', 'from_code_out')
-        graph.add_edge('from_code_out', 'show_file_path')
-        graph.add_edge('show_file_path', 'code_reader')
+        graph.add_edge('code_generator', 'code_reader')
         graph.add_edge('code_reader', 'show_code_content')
         graph.add_edge('show_code_content', END)
         

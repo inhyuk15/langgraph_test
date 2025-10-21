@@ -10,3 +10,6 @@ class TestState(TypedDict, total=False):
     messages: Annotated[list[BaseMessage], add_messages]
     remaining_steps: int
     structured_response: dict
+
+class CodeReaderState(TypedDict, total=False):
+    pass

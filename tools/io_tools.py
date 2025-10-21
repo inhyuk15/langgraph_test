@@ -3,12 +3,20 @@ from typing import Annotated
 from langchain_core.tools import tool
 from pydantic import BaseModel, Field
 
+
+class ToolMeta(BaseModel):
+    function_name: str = Field(..., description="name of the tool used")
+    parameters: dict = Field(..., description="parameters passed to the tool")
+    
 class File(BaseModel):
     file_path: str = Field(..., description="file's absolute path")
     extension: str = Field(..., description="file extension")
 
 class WriteFileOutput(BaseModel):
     file: File
+    meta: ToolMeta = Field(..., description="metadata about tool call")
+
+
 
 @tool("write_file")
 def write_file(file_path: Annotated[str, "absolute path to save the file"], content: Annotated[str, "file content"]) -> str:
@@ -19,14 +27,20 @@ def write_file(file_path: Annotated[str, "absolute path to save the file"], cont
     os.makedirs(os.path.dirname(file_path), exist_ok=True)
     with open(file_path, "w", encoding="utf-8") as f:
         f.write(content)
+        # TODO: content는 너무 길 수 있어서 어느정도로 주어야하는지 애매함. 일단 안넣음.
         return WriteFileOutput(
-            file=File(file_path=file_path, extension=file_path.split(".")[-1])
+            file=File(file_path=file_path, extension=file_path.split(".")[-1]),
+            meta=ToolMeta(
+                function_name="read_file",
+                parameters={"file_path": file_path},
+            )
         )
 
 
 class ReadFileOutput(BaseModel):
     file: File
     content: str = Field(..., description="file content")
+    meta: ToolMeta = Field(..., description="metadata about tool call")
 
 @tool("read_file")
 def read_file(file_path: Annotated[str, "absolute path of the file to read"]) -> ReadFileOutput:
@@ -42,5 +56,9 @@ def read_file(file_path: Annotated[str, "absolute path of the file to read"]) ->
 
     return ReadFileOutput(
         file=File(file_path=file_path, extension=file_path.split(".")[-1]),
-        content=content
+        content=content,
+        meta=ToolMeta(
+            function_name="read_file",
+            parameters={"file_path": file_path},
+        )
     )
