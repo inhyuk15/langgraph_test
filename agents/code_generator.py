@@ -15,7 +15,6 @@ save only structured format data
 
 class CodeGeneratorOut(BaseModel):
     file: File = Field(..., description="Metadata object including both file path and extension, e.g., {file_path: './outputs/hello.c', extension: 'c'}")
-    structured_response: dict
 
 # TODO: create_agent vs create_react_agent 비교 필요 (mitmproxy로 실제로 state가 어떻게 전달되는지, 진짜 차이가 있는지. subState에 대해 바뀌었다고 하는데)
 def build_code_generator(model):
@@ -26,10 +25,6 @@ def build_code_generator(model):
         response_format=CodeGeneratorOut,
     )
     return agent
-    # def wrapper(state):
-    #     result = agent.invoke(state)
-    #     return {"file": result.file_path, "structured_repsonse": result.structured_response}
 
-    # return RunnableLambda(wrapper)
     
     

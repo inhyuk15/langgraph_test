@@ -10,7 +10,6 @@ read the code using read file tool to read given path.
 class CodeReaderOut(BaseModel):
     file_path: str = Field(description="")
     code: str = Field(..., description="code content in given file path")
-    structured_response: dict
 
 def build_code_reader(model):
     return create_agent(
