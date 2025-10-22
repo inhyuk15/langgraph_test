@@ -27,14 +27,16 @@ def write_file(file_path: Annotated[str, "absolute path to save the file"], cont
     os.makedirs(os.path.dirname(file_path), exist_ok=True)
     with open(file_path, "w", encoding="utf-8") as f:
         f.write(content)
-        # TODO: content는 너무 길 수 있어서 어느정도로 주어야하는지 애매함. 일단 안넣음.
-        return WriteFileOutput(
-            file=File(file_path=file_path, extension=file_path.split(".")[-1]),
-            meta=ToolMeta(
-                function_name="read_file",
-                parameters={"file_path": file_path},
-            )
+        
+        
+    # TODO: content는 너무 길 수 있어서 어느정도로 주어야하는지 애매함. 일단 안넣음.
+    return WriteFileOutput(
+        file=File(file_path=file_path, extension=file_path.split(".")[-1]),
+        meta=ToolMeta(
+            function_name="write_file",
+            parameters={"file_path": file_path},
         )
+    )
 
 
 class ReadFileOutput(BaseModel):

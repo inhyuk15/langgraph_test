@@ -11,6 +11,7 @@ from agents.code_reader import build_code_reader
 def from_code_out(state):
     sr = state.get("structured_response")
     file = getattr(sr, 'file')
+    print(f' this is generated file: {file}')
     return state
 
 def show_file_path(state: TestState):
@@ -45,7 +46,8 @@ class Test:
         
         
         graph.add_edge(START, 'code_generator')
-        graph.add_edge('code_generator', 'code_reader')
+        graph.add_edge('code_generator', 'from_code_out')
+        graph.add_edge('from_code_out', 'code_reader')
         graph.add_edge('code_reader', 'show_code_content')
         graph.add_edge('show_code_content', END)
         
